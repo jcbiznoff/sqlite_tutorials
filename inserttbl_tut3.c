@@ -1,24 +1,22 @@
-//include sqlite3
-//open connection to db
-//if error, exit program
-//else print success message
-//close connection to db
-//exit program
-//
-//
+/**
+ * Summary: Insert data values into USERINFO table
+ * Insert 5 different rows into USERINFO table
+ *
+ * Author: Hyunjin Chung
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <sqlite3.h>
-//need for strlen
 #include <string.h>
+
+#define DBNAME "./wargame.db"
 
 int main(int argc, char **argv)
 {
-    //1. open connection to db
-    sqlite3 * db= NULL;
-    const char * dbName = "./jaygame.db";
-    if( SQLITE_OK != sqlite3_open(dbName, &db)){
+    //1. open connection to db.
+    sqlite3 * db = NULL;
+    if( SQLITE_OK != sqlite3_open(DBNAME, &db)){
         printf("db open failed...\n");
         printf("error message is: %s\n", sqlite3_errmsg(db));
         sqlite3_close(db);
@@ -27,13 +25,13 @@ int main(int argc, char **argv)
 
     //2. prepare statement
     const char * sqlCreateTbl = "CREATE TABLE IF NOT EXISTS USERINFO( \
-                                 ID         INT     PRIMARY KEY     NOT NULL, \
-                                 USER       TEXT                    NOT NULL, \
-                                 STAGE      INT                     NOT NULL, \
-                                 ITEM       TEXT                    NOT NULL, \
-                                 RECORD     TEXT                    NOT NULL, \
-                                 CHARACTER  TEXT                    NOT NULL, \
-                                 RANK       INT                     NOT NULL \
+                                 ID        INT   PRIMARY KEY NOT NULL, \
+                                 USER      TEXT              NOT NULL, \
+                                 STAGE     INT               NOT NULL, \
+                                 ITEM      TEXT              NOT NULL, \
+                                 RECORD    TEXT              NOT NULL, \
+                                 CHARACTER TEXT              NOT NULL, \
+                                 RANK      INT               NOT NULL \
                                  );"; //careful about semicolon. also "if not exists" is important. otherwise error
     int sqlCreateTblLen = strlen(sqlCreateTbl) + 1;
     sqlite3_stmt *ppStmt = NULL;
@@ -49,7 +47,7 @@ int main(int argc, char **argv)
         printf("error message is: %s\n", sqlite3_errmsg(db));
     }
 
-    //3. step, and finalize
+    //3. step and finalize
     if(NULL != ppStmt){
         if(SQLITE_DONE != sqlite3_step(ppStmt)){
             printf("step failed...\n");
@@ -62,29 +60,25 @@ int main(int argc, char **argv)
         }
     }
 
-    //4. insert new values into table
+    //4. insert data values into table
     const char * sqlUserInfo = "INSERT INTO USERINFO(ID, USER, STAGE, ITEM, RECORD, CHARACTER, RANK) \
-                                 VALUES (1, 'Hyunjin', 20, 'Big Sword', '1 hour', 4); \
-                                 INSERT INTO USERINFO(ID, USER, STAGE, ITEM, RECORD, CHARACTER, RANK) \
-                                 VALUES (2, 'JayBird', 10, 'SpearHead', '24 hours', 3); \
-                                 INSERT INTO USERINFO(ID, USER, STAGE, ITEM, RECORD, CHARACTER, RANK) \
-                                 VALUES (3, 'Constella', 1, 'MaceII', '4 hours', 2); \
-                                 INSERT INTO USERINFO(ID, USER, STAGE, ITEM, RECORD, CHARACTER, RANK) \
-                                 VALUES (4, 'Remez', 9, 'Big Sword II', '19 hours', 1); \
-                                 INSERT INTO USERINFO(ID, USER, STAGE, ITEM, RECORD, CHARACTER, RANK) \
-                                 VALUES (5, 'GOON', 5, 'AXE of doom', '11 hours', 5); \
-                                 "; //mistake semicolon
+                                 VALUES (1, 'Hyunjin', 20, 'Big Sword', '1 hour', 'Goblin', 4), \
+                                 (2, 'JayBird', 10, 'SpearHead', '24 hours', 'Sorcerer', 3), \
+                                 (3, 'Constella', 1, 'MaceII', '4 hours', 'Bat', 2), \
+                                 (4, 'Remez', 9, 'Big Sword II', '19 hours', 'human', 1), \
+                                 (5, 'GOON', 5, 'AXE of doom', '11 hours', 'zombie', 5); \
+                                 ";
     int sqlUserInfoLen = strlen(sqlUserInfo) + 1;
     sqlite3_stmt *ppStmt2 = NULL;
     const char **pzTail2 = NULL;
 
-    //Exactly as above
+    //5. preapre, step, and finalize
     if(SQLITE_OK != sqlite3_prepare_v2(
                                 db,
-                                sqlUserInfo,    //this is different
-                                sqlUserInfoLen, //this is different
-                                &ppStmt2,       //this is different
-                                pzTail2)){      //this is different
+                                sqlUserInfo,    //use new insert string
+                                sqlUserInfoLen, //match max length
+                                &ppStmt2,       //use new string
+                                pzTail2)){      //use new pointer
 
         printf("preparing statement failed...\n");
         printf("error message is: %s\n", sqlite3_errmsg(db));
@@ -94,6 +88,8 @@ int main(int argc, char **argv)
         if(SQLITE_DONE != sqlite3_step(ppStmt2)){ //different var
             printf("step failed...\n");
             printf("error message is: %s\n", sqlite3_errmsg(db));
+        }else{
+            printf("successfully inserted values to USERINFO table\n");
         }
 
         if(SQLITE_OK != sqlite3_finalize(ppStmt2)){ //different var
@@ -102,8 +98,7 @@ int main(int argc, char **argv)
         }
     }
 
-    printf("successfully inserted values to USERINFO table\n");
-
+    //6. close connection to db.
     sqlite3_close(db);
     return 0;
 }
