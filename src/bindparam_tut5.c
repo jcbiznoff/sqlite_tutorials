@@ -6,7 +6,7 @@
  *  such as dropping tables. If parameter binding is used, such statements can be detected.
  *
  *  Author: Hyunjin Chung
- *
+ *  Useful Link: http://www.adp-gmbh.ch/sqlite/bind_insert.html
  */
 
 #include <stdio.h>

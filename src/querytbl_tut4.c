@@ -132,6 +132,7 @@ int main(int argc, char **argv)
         }
         printf("\n");
     }
+
     if(SQLITE_OK != sqlite3_finalize(ppStmt3)){ //different var
         printf("finalize failed...\n");
         printf("error message is: %s\n", sqlite3_errmsg(db));
